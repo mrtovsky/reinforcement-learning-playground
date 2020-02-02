@@ -46,15 +46,16 @@ class Agent(object):
 
         return action_value
 
-    def pick_best_action(self, state):
-        for idx, action in enumerate(range(self.env.action_space.n)):
+    def pick_action(self, state):
+        best_value, best_action = 0, None
+        for action in range(self.env.action_space.n):
             action_value = self.calculate_action_value(state, action)
-            if idx == 0:
+            if best_value < action_value:
                 best_action = action
                 best_value = action_value
-            elif best_value < action_value:
-                best_value = action_value
-                best_action = action
+
+        if best_action is None:
+            best_action = self.env.action_space.sample()
 
         return best_action
 
@@ -65,7 +66,7 @@ class Agent(object):
         is_done = False
 
         while not is_done:
-            action = self.pick_best_action(state)
+            action = self.pick_action(state)
             new_state, reward, is_done, _ = env.step(action)
 
             if new_state not in self.rewards.keys():
